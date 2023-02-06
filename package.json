@@ -1,7 +1,7 @@
 {
   "name": "csipos",
   "version": "1.0.0",
-  "description": "",
+  "description": "This is a Discord bot for the CSLYS Discord server. It is written in JavaScript and uses the [Discord.js](https://discord.js.org) library.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -11,5 +11,13 @@
   "dependencies": {
     "discord.js": "^14.7.1",
     "dotenv": "^16.0.3"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yfm-po/CSLYS-Discord-Bot.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yfm-po/CSLYS-Discord-Bot/issues"
+  },
+  "homepage": "https://github.com/yfm-po/CSLYS-Discord-Bot#readme"
 }
