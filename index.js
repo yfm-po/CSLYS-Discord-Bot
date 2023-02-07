@@ -7,54 +7,92 @@ import { Client, Intents, Collection } from 'discord.js';
 import { Player } from 'discord-player';
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_MESSAGES] });
-
-const commands = [];
 client.commands = new Collection();
 
+let commands = [];
 const commandsPath = path.join(__dirname, 'commands');
 const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
 
-for (const file of commandFiles) {
-    const filePath = path.join(commandsPath, file);
-    const command = await import(filePath);
+this.setUpCommands(commandFiles, commandsPath, commands);
+this.setUpAudioPlayer(client, 'highestaudio', 1 << 25);
+this.onClientReadyListener(client);
+this.interactionListener(interaction);
+client.login(process.env.TOKEN);
 
-    client.commands.set(command.data.name, command);
-    commands.push(command.data.toJSON());
+/**
+ * 
+ * @param {Array} commandFiles - Array of command files
+ * @param {String / Path} commandsPath - Path to commands folder
+ * @param {Array} commands - Array of commands
+ * @returns {void}
+ */
+const setUpCommands = (commandFiles, commandsPath, commands) => {
+    for (const file of commandFiles) {
+        const filePath = path.join(commandsPath, file);
+        const command = require(filePath);
+    
+        client.commands.set(command.data.name, command);
+        commands.push(command);
+    }
 }
 
-client.player = new Player(client, {
-    ytdlOptions: {
-        quality: 'highestaudio',
-        highWaterMark: 1 << 25,
-    }
-});
+/**
+ * 
+ * @param {Client} client - Discord Client
+ * @param {String} quality - Quality of audio
+ * @param {Number} highWaterMark - High Water Mark
+ * @returns {void}
+ */
+const setUpAudioPlayer = (client, quality, highWaterMark) => {
+    client.player = new Player(client, {
+        ytdlOptions: {
+            quality: quality,
+            highWaterMark: highWaterMark,
+        }
+    });
+}
 
-client.on("ready", () => {
-    logger.info(`Logged in as ${client.user.tag}!`);
-    const IDs = client.guilds.cache.map(guild => guild.id);
-    const rest = new REST({ version: '9' }).setToken(process.env.TOKEN);
+/**
+ * 
+ * @param {Client} client - Discord Client
+ * @returs {void}
+ * @description - Registers commands to all guilds the bot is in 
+ */
+const onClientReadyListener = (client) => {
+    client.on("ready", () => {
+        logger.info(`Logged in as ${client.user.tag}!`);
+        client.user.setActivity("with your mom", { type: "PLAYING" });
+    
+        const IDs = client.guilds.cache.map(guild => guild.id);
+        const rest = new REST({ version: '9' }).setToken(process.env.TOKEN);
+    
+        for (const id of IDs) {
+            rest.put(Routes.applicationGuildCommands(process.env.CLIENT_ID, id), { body: commands }).then(() => {
+                logger.info(`Successfully registered application commands for ${id}`).catch(console.error);
+            });
+        }
+    });
+}
 
-    for (const id of IDs) {
-        rest.put(Routes.applicationGuildCommands(process.env.CLIENT_ID, id), { body: commands }).then(() => {
-            logger.info(`Successfully registered application commands for ${id}`).catch(console.error);
-        });
-    }
-});
-
-client.on("interactionCreate", async (interaction) => {
+/**
+ * 
+ * @param {Interaction} interaction - Interaction object
+ * @returns {void}
+ * @description - Listener for interactions
+ */
+const interactionListener = async (interaction) => {
     if (interaction.isCommand()) {
         const command = client.commands.get(interaction.commandName);
 
-        if (!command) return;
-
-        try {
-            await command.execute(interaction);
-        } catch (error) {
-            console.error(error);
-            await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+        if (command != null) {
+            try {
+                await command.execute(interaction);
+            } catch (error) {
+                console.error(error);
+                await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+            }
         }
     }
-});
+}
 
-client.login(process.env.TOKEN);
 
