@@ -2,8 +2,6 @@ import { SlashCommandBuilder } from '@discordjs/builders';
 import { CommandInteraction, MessageEmbed } from 'discord.js';
 import { QueryType } from 'discord-player';
 
-let slashCommand;
-
 module.exports = {
     data: setUpSlashCommand('play', 'This command plays a given song in the voice channel').addSubcommand(subcommand => {
         subcommand.setName('search').setDescription('this subcommand searches for a given song').addStringOption(option => {
@@ -19,7 +17,7 @@ module.exports = {
         })
     }),
 
-    const execute = async (client, interaction) => {
+    execute: async (client, interaction) => {
         if (interaction.member.voice.channel) {
             const queue = await client.player.createQueue(interaction.guild);
             if (!queue.connection) await queue.connect(interaction.member.voice.channel);
@@ -100,12 +98,12 @@ module.exports = {
 
             if (!queue.playing) await queue.play();
             await interaction.reply({ embeds: [messageEmbed] });
+        } else {
+            await interaction.reply({ embeds: [new MessageEmbed()
+                .setColor('#ff0000')
+                .setTitle('Error')
+                .setDescription('You need to be in a voice channel to use this command!')] });
         }
-            
-        await interaction.reply({ embeds: [embed = new MessageEmbed()
-            .setColor('#ff0000')
-            .setTitle('Error')
-            .setDescription('You need to be in a voice channel to use this command!')] });
     }
 };
 

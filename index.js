@@ -1,12 +1,12 @@
-import dotenv from 'dotenv'; dotenv.config();
-import fs from 'node:fs';
-import path from 'node:path';
-import { REST } from '@discordjs/rest';
-import { Routes } from 'discord-api-types/v9';
-import { Client, Intents, Collection } from 'discord.js';
-import { Player } from 'discord-player';
+require('dotenv').config();
+const fs = require('fs');
+const path = require('path');
+const { REST } = require('@discordjs/rest');
+const { Routes } = require('discord-api-types/v9');
+const { Client, GatewayIntentBits, Collection } = require('discord.js');
+const { Player } = require('discord-player');
 
-const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_MESSAGES] });
+const client = new Client({ intents: [GatewayIntentBits.GUILD, GatewayIntentBits.GUILD_MESSAGES, GatewayIntentBits.GUILD_VOICE_STATES] });
 client.commands = new Collection();
 
 let commands = [];
