@@ -109,6 +109,13 @@ module.exports = {
     }
 };
 
+/**
+ * 
+ * @param {String} name 
+ * @param {String} description 
+ * @returns {SlashCommandBuilder}
+ * @description Sets up a slash command using SlashCommandBuilder with the given name and description
+ */
 const setUpSlashCommand = (name, description) => {
     return new SlashCommandBuilder().setName(name).setDescription(description);
 }
