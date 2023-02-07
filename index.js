@@ -16,7 +16,7 @@ const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('
 this.setUpCommands(commandFiles, commandsPath, commands);
 this.setUpAudioPlayer(client, 'highestaudio', 1 << 25);
 this.onClientReadyListener(client);
-this.interactionListener(interaction);
+this.interactionListener(client, interaction);
 client.login(process.env.TOKEN);
 
 /**
@@ -25,6 +25,7 @@ client.login(process.env.TOKEN);
  * @param {String / Path} commandsPath - Path to commands folder
  * @param {Array} commands - Array of commands
  * @returns {void}
+ * @description - Sets up commands
  */
 const setUpCommands = (commandFiles, commandsPath, commands) => {
     for (const file of commandFiles) {
@@ -42,6 +43,7 @@ const setUpCommands = (commandFiles, commandsPath, commands) => {
  * @param {String} quality - Quality of audio
  * @param {Number} highWaterMark - High Water Mark
  * @returns {void}
+ * @description - Sets up the audio player
  */
 const setUpAudioPlayer = (client, quality, highWaterMark) => {
     client.player = new Player(client, {
@@ -80,13 +82,13 @@ const onClientReadyListener = (client) => {
  * @returns {void}
  * @description - Listener for interactions
  */
-const interactionListener = async (interaction) => {
+const interactionListener = async (client, interaction) => {
     if (interaction.isCommand()) {
         const command = client.commands.get(interaction.commandName);
 
         if (command != null) {
             try {
-                await command.execute(interaction);
+                await command.execute(client, interaction);
             } catch (error) {
                 console.error(error);
                 await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
