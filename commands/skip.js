@@ -1,8 +1,10 @@
-import { SlashCommandBuilder } from '@discordjs/builders';
-import { CommandInteraction, MessageEmbed } from 'discord.js';
+const { SlashCommandBuilder } = require('@discordjs/builders');
+const { MessageEmbed } = require('discord.js');
 
 module.exports = {
-    data: setUpSlashCommand('skip', 'This command skips the current song in the queue'),
+    data: new SlashCommandBuilder()
+        .setName('skip')
+        .setDescription('skip the current song'),
 
     execute: async (client, interaction) => {
         const queue = client.player.getQueue(interaction.guild);

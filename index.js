@@ -1,23 +1,18 @@
 require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
+
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
 const { Client, GatewayIntentBits, Collection } = require('discord.js');
 const { Player } = require('discord-player');
 
-const client = new Client({ intents: [GatewayIntentBits.GUILD, GatewayIntentBits.GUILD_MESSAGES, GatewayIntentBits.GUILD_VOICE_STATES] });
+const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildVoiceStates] });
 client.commands = new Collection();
 
 let commands = [];
 const commandsPath = path.join(__dirname, 'commands');
 const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
-
-this.setUpCommands(commandFiles, commandsPath, commands);
-this.setUpAudioPlayer(client, 'highestaudio', 1 << 25);
-this.onClientReadyListener(client);
-this.interactionListener(client, interaction);
-client.login(process.env.TOKEN);
 
 /**
  * 
@@ -42,16 +37,17 @@ const setUpCommands = (commandFiles, commandsPath, commands) => {
  * @param {Client} client - Discord Client
  * @param {String} quality - Quality of audio
  * @param {Number} highWaterMark - High Water Mark
- * @returns {void}
+ * @returns {Player} - Discord Audio Player
  * @description - Sets up the audio player
  */
 const setUpAudioPlayer = (client, quality, highWaterMark) => {
-    client.player = new Player(client, {
+    const player = new Player(client, {
         ytdlOptions: {
             quality: quality,
             highWaterMark: highWaterMark,
         }
     });
+    return player;
 }
 
 /**
@@ -69,32 +65,41 @@ const onClientReadyListener = (client) => {
         const rest = new REST({ version: '9' }).setToken(process.env.TOKEN);
     
         for (const id of IDs) {
-            rest.put(Routes.applicationGuildCommands(process.env.CLIENT_ID, id), { body: commands }).then(() => {
-                logger.info(`Successfully registered application commands for ${id}`).catch(console.error);
-            });
+            rest.put(Routes.applicationGuildCommands(process.env.CLIENT_ID, id), 
+            {body: commands})
+            .then(() => console.log('Successfully updated commands for guild ' + id))
+            .catch(console.error);
         }
     });
 }
 
 /**
  * 
- * @param {Interaction} interaction - Interaction object
+ * @param {Client} client - Discord Client
  * @returns {void}
  * @description - Listener for interactions
  */
-const interactionListener = async (client, interaction) => {
-    if (interaction.isCommand()) {
-        const command = client.commands.get(interaction.commandName);
+const interactionListener = async (client) => {
+    client.on('interactionCreate', async (interaction) => {
+        if (interaction.isCommand()) {
+            const command = client.commands.get(interaction.commandName);
 
-        if (command != null) {
-            try {
-                await command.execute(client, interaction);
-            } catch (error) {
-                console.error(error);
-                await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+            if (command != null) {
+                try {
+                    await command.execute(client, interaction);
+                } catch (error) {
+                    console.error(error);
+                    await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+                }
             }
         }
-    }
+    });
 }
+
+setUpCommands(commandFiles, commandsPath, commands);
+client.player = setUpAudioPlayer(client, 'highestaudio', 1 << 25);
+onClientReadyListener(client);
+interactionListener(client);
+client.login(process.env.TOKEN);
 
 

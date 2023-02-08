@@ -1,8 +1,10 @@
-import { SlashCommandBuilder } from '@discordjs/builders';
-import { CommandInteraction, MessageEmbed } from 'discord.js';
+const { SlashCommandBuilder } = require('@discordjs/builders');
+const { MessageEmbed } = require('discord.js');
 
 module.exports = {
-    data: setUpSlashCommand('pause', 'This command pauses the current song in the queue'),
+    data: new SlashCommandBuilder()
+        .setName('pause')
+        .setDescription('pause the current song'),
 
     execute: async (client, interaction) => {
         const queue = client.player.getQueue(interaction.guild);
@@ -26,15 +28,4 @@ module.exports = {
             });
         }
     }
-}
-
-/**
- * 
- * @param {String} name 
- * @param {String} description 
- * @returns {SlashCommandBuilder}
- * @description Sets up a slash command using SlashCommandBuilder with the given name and description
- */
-const setUpSlashCommand = (name, description) => {
-    return new SlashCommandBuilder().setName(name).setDescription(description);
 }

@@ -1,21 +1,29 @@
-import { SlashCommandBuilder } from '@discordjs/builders';
-import { CommandInteraction, MessageEmbed } from 'discord.js';
-import { QueryType } from 'discord-player';
+const { SlashCommandBuilder } = require('@discordjs/builders');
+const { MessageEmbed } = require('discord.js');
+const { QueryType } = require('discord-player');
 
 module.exports = {
-    data: setUpSlashCommand('play', 'This command plays a given song in the voice channel').addSubcommand(subcommand => {
-        subcommand.setName('search').setDescription('this subcommand searches for a given song').addStringOption(option => {
-            option.setName('searchterms').setDescription('search keywords').setRequired(true);
-        })
-    }).addSubcommand(subcommand => {
-        subcommand.setName('playlist').setDescription('plays a given playlist based on URL').addStringOption(option => {
-            option.setName('URL').setDescription('playlist url').setRequired(true);
-        })
-    }).addSubcommand(subcommand => {
-        subcommand.setName('song').setDescription('plays a given song based on URL').addStringOption(option => {
-            option.setName('URL').setDescription('URL of the given song').setRequired(true);
-        })
-    }),
+    data: new SlashCommandBuilder().setName("play").setDescription("This command plays a given song in the voice channel")
+    .addSubcommand(subcommand =>
+        subcommand
+            .setName("search")
+            .setDescription("This subcommand searches for a given song")
+            .addStringOption(option =>
+                option.setName("search").setDescription("search for keywords").setRequired(true)
+            )
+    )
+    .addSubcommand(subcommand =>
+        subcommand
+            .setName("playlist")
+            .setDescription("This command plays a given playlist based on URL")
+            .addStringOption(option => option.setName("url").setDescription("URL of the given playlist").setRequired(true))
+    )
+    .addSubcommand(subcommand =>
+        subcommand
+            .setName("song")
+            .setDescription("Plays a given song based on URL")
+            .addStringOption(option => option.setName("url").setDescription("URL of the given song").setRequired(true))
+    ),
 
     execute: async (client, interaction) => {
         if (interaction.member.voice.channel) {
@@ -106,15 +114,3 @@ module.exports = {
         }
     }
 };
-
-/**
- * 
- * @param {String} name 
- * @param {String} description 
- * @returns {SlashCommandBuilder}
- * @description Sets up a slash command using SlashCommandBuilder with the given name and description
- */
-const setUpSlashCommand = (name, description) => {
-    return new SlashCommandBuilder().setName(name).setDescription(description);
-}
-
