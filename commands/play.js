@@ -45,7 +45,7 @@ module.exports = {
                 searchEngine: QueryType.YOUTUBE_VIDEO
             });
 
-            if (resultURL.tracks.length === 0) {
+            if (resultURL.tracks.length < 1) {
                 messageEmbed.setColor('#ff0000').setTitle('Error').setDescription('No results found!');
                 return interaction.reply({ embeds: [messageEmbed] });
             }
@@ -67,7 +67,7 @@ module.exports = {
             });
 
             if (resultPlaylist.tracks.length < 1) {
-                messageEmbed.setColor('#ff0000').setTitle('Error').setDescription('No results found!');
+                messageEmbed.setColor('#ff0000').setTitle('Error').setDescription('No results found! The URL might not be a playlist!');
                 return interaction.reply({ embeds: [messageEmbed] });
             }
 
