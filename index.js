@@ -28,7 +28,7 @@ const setUpCommands = (commandFiles, commandsPath, commands) => {
         const command = require(filePath);
     
         client.commands.set(command.data.name, command);
-        commands.push(command);
+        commands.push(command.data.toJSON());
     }
 }
 
@@ -58,7 +58,7 @@ const setUpAudioPlayer = (client, quality, highWaterMark) => {
  */
 const onClientReadyListener = (client) => {
     client.on("ready", () => {
-        logger.info(`Logged in as ${client.user.tag}!`);
+        //logger.info(`Logged in as ${client.user.tag}!`);
         client.user.setActivity("with your mom", { type: "PLAYING" });
     
         const IDs = client.guilds.cache.map(guild => guild.id);
@@ -86,7 +86,7 @@ const interactionListener = async (client) => {
 
             if (command != null) {
                 try {
-                    await command.execute(client, interaction);
+                    await command.execute({client, interaction});
                 } catch (error) {
                     console.error(error);
                     await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });

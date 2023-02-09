@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed } = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 const { QueryType } = require('discord-player');
 
 module.exports = {
@@ -26,11 +26,11 @@ module.exports = {
     ),
 
     execute: async (client, interaction) => {
-        if (interaction.member.voice.channel) {
+        if (interaction.member.voice.channel != null) {
             const queue = await client.player.createQueue(interaction.guild);
             if (!queue.connection) await queue.connect(interaction.member.voice.channel);
 
-            let messageEmbed = new MessageEmbed();
+            const messageEmbed = new EmbedBuilder();
 
             switch (interaction.options.getSubcommand()) {
                 case 'song':

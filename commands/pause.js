@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed } = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -11,7 +11,7 @@ module.exports = {
 
         if (queue != null) {
             const currentTrack = queue.current;
-            const messageEmbed = new MessageEmbed();
+            const messageEmbed = new EmbedBuilder();
             queue.setPaused(true);
 
             await interaction.reply({
@@ -21,7 +21,7 @@ module.exports = {
                     .setThumbnail(currentTrack.thumbnail)]
                 });
         } else {
-            await interaction.reply({ embeds: [new messageEmbed
+            await interaction.reply({ embeds: [messageEmbed 
                 .setColor('#ff0000')
                 .setTitle('Error')
                 .setDescription('There is no song playing!')]

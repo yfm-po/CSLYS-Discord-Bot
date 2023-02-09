@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed } = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -11,7 +11,7 @@ module.exports = {
 
         if (queue != null) {
             const currentTrack = queue.current;
-            const messageEmbed = new MessageEmbed();
+            const messageEmbed = new EmbedBuilder();
             queue.skip();
 
             await interaction.reply({
@@ -27,15 +27,4 @@ module.exports = {
             });
         }
     }
-}
-
-/**
- * 
- * @param {String} name 
- * @param {String} description 
- * @returns {SlashCommandBuilder}
- * @description Sets up a slash command using SlashCommandBuilder with the given name and description
- */
-const setUpSlashCommand = (name, description) => {
-    return new SlashCommandBuilder().setName(name).setDescription(description);
 }
